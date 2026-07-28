@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 
+const BASE = import.meta.env.BASE_URL;
+
 interface DominoPiece {
   id: string;
   sideA: number;
@@ -110,7 +112,7 @@ export default function Game({
         <div
           id="player-main"
           className={`${isTurn ? "turn-player" : ""} ${isPassing ? "pass" : ""}`}
-        >
+        > 
           {myHand.map((piece, i) => {
             const playable = isPlayable(piece);
             return (
@@ -123,12 +125,12 @@ export default function Game({
               >
                 <img
                   className="sideA"
-                  src={`../src/assets/part-${piece.sideA}.jpg`}
+                  src={`${BASE}parts/part-${piece.sideA}.jpg`}
                   alt={`part-${piece.id}`}
                 />
                 <img
                   className="sideB"
-                  src={`../src/assets/part-${piece.sideB}.jpg`}
+                  src={`${BASE}parts/part-${piece.sideB}.jpg`}
                   alt={`part-${piece.id}`}
                 />
               </span>
@@ -159,8 +161,8 @@ export default function Game({
             const isDouble = p.sideA === p.sideB;
             return (
               <div key={index} className={`table-piece ${isDouble ? "dupla-piece" : ""}`}>
-                <img src={`../src/assets/part-${p.sideA}.jpg`} alt={`${p.sideA}`} />
-                <img src={`../src/assets/part-${p.sideB}.jpg`} alt={`${p.sideB}`} />
+                <img src={`${BASE}parts/part-${p.sideA}.jpg`} alt={`${p.sideA}`} />
+                <img src={`${BASE}parts/part-${p.sideB}.jpg`} alt={`${p.sideB}`} />
               </div>
             );
           })}
