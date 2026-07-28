@@ -127,17 +127,18 @@ function App() {
 
   return (
     <div id="rooms-screen">
-      <h1 id="status-server">
+      <h1>Domino online</h1>
+      <h2 id="status-server">
         Status do server: {connected ? "conectado ✅" : "desconectado ❌"}
-      </h1>
+      </h2>
       {playerNumber === null ? (
         <button onClick={handleJoin} id="btn-join">
           Entrar na sala
         </button>
       ) : (
-        <p id="you-player-number">Você é o jogador {playerNumber}</p>
+        <p className="you-player-number">Você é o jogador {playerNumber}</p>
       )}
-      <p>Jogadores na sala: {playersCount}/4</p>
+      <p className="you-player-number">Jogadores na sala: {playersCount}/4</p>
       {countdown !== null && countdown > 0 && (
         <p>🔒 Sala fechada. Jogo começa em {countdown}...</p>
       )}
