@@ -20,16 +20,35 @@ function App() {
   const [tablePieces, setTablePieces] = useState<any[]>([]);
   const [passedPlayer, setPassedPlayer] = useState<number | null>(null);
   const [gameOverInfo, setGameOverInfo] = useState<{ winner?: number; tie?: boolean } | null>(null);
+  const [abortMessage, setAbortMessage] = useState<string | null>(null);
+  const [joinError, setJoinError] = useState<string | null>(null);
+
+  // Reseta todo o estado de jogo (volta para a tela de lobby)
+  const resetGameState = () => {
+    setGameStarted(false);
+    setMyHand([]);
+    setCurrentTurn(null);
+    setTableEnds([]);
+    setTablePieces([]);
+    setPassedPlayer(null);
+    setGameOverInfo(null);
+    setCountdown(null);
+    setAbortMessage(null);
+  };
 
   useEffect(() => {
     socket.on("connect", () => setConnected(true));
-    socket.on("disconnect", () => setConnected(false));
+    socket.on("disconnect", () => {
+      setConnected(false);
+    });
 
     socket.on("player-assigned", (data: { playerNumber: number; roomId: string }) => {
+      setJoinError(null);
       setPlayerNumber(data.playerNumber);
     });
 
-    socket.on("room-update", (data: { playersCount: number; maxPlayers: number }) => {
+    // O back-end agora inclui o campo disconnectedPlayer opcional
+    socket.on("room-update", (data: { playersCount: number; maxPlayers: number; disconnectedPlayer?: number }) => {
       setPlayersCount(data.playersCount);
     });
 
@@ -40,6 +59,7 @@ function App() {
     socket.on("game-start", () => {
       setCountdown(null);
       setPlayersCount(0);
+      setAbortMessage(null);
       setGameStarted(true);
     });
 
@@ -47,7 +67,7 @@ function App() {
       setMyHand(data.pieces);
     });
 
-    socket.on("turn-update", (data: { currentTurn: number, tableEnds: number[], tablePieces: any[] }) => {
+    socket.on("turn-update", (data: { currentTurn: number | null; tableEnds: number[]; tablePieces: any[] }) => {
       setCurrentTurn(data.currentTurn);
       setTableEnds(data.tableEnds);
       setTablePieces(data.tablePieces);
@@ -62,6 +82,17 @@ function App() {
       setGameOverInfo(data);
     });
 
+    // NOVO: Partida abortada por desconexão de jogador
+    socket.on("game-aborted", (data: { message: string; disconnectedPlayer?: number }) => {
+      resetGameState();
+      setAbortMessage(data.message);
+    });
+
+    // NOVO: Erro ao tentar entrar em sala (ex: sala cheia ou socket duplicado)
+    socket.on("join-error", (data: { message: string }) => {
+      setJoinError(data.message);
+    });
+
     return () => {
       socket.off("connect");
       socket.off("disconnect");
@@ -73,6 +104,8 @@ function App() {
       socket.off("turn-update");
       socket.off("player-passed");
       socket.off("game-over");
+      socket.off("game-aborted");
+      socket.off("join-error");
     };
   }, []);
 
@@ -87,6 +120,7 @@ function App() {
   }, [countdown]);
 
   const handleJoin = () => {
+    setJoinError(null);
     socket.emit("join-room");
   };
 
@@ -131,6 +165,21 @@ function App() {
       <h2 id="status-server">
         Status do server: {connected ? "conectado ✅" : "desconectado ❌"}
       </h2>
+
+      {/* Mensagem de partida abortada (jogador desconectou) */}
+      {abortMessage && (
+        <p id="abort-message" style={{ color: 'orange', fontWeight: 'bold' }}>
+          ⚠️ {abortMessage}
+        </p>
+      )}
+
+      {/* Erro ao tentar entrar na sala */}
+      {joinError && (
+        <p id="join-error" style={{ color: 'red', fontWeight: 'bold' }}>
+          ❌ {joinError}
+        </p>
+      )}
+
       {playerNumber === null ? (
         <button onClick={handleJoin} id="btn-join">
           Entrar na sala
