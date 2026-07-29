@@ -95,10 +95,6 @@ export default function Game({
 
   return (
     <>
-      <p className="description">
-        Domino - {isTurn ? "SUA VEZ" : `Vez do Jogador ${currentTurn}`}
-      </p>
-      
       <div className="container">
         {pieceToPlaySide && (
           <div className="side-choice" style={{ position: 'absolute', zIndex: 10, background: 'rgba(255,255,255,0.9)', padding: '20px', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center' }}>
