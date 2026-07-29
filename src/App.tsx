@@ -178,6 +178,7 @@ function App() {
   }
 
   return (
+    <>
     <div id="rooms-screen">
       <h1>Domino online</h1>
       <h2 id="status-server">
@@ -210,6 +211,8 @@ function App() {
         <p>🔒 Sala fechada. Jogo começa em {countdown}...</p>
       )}
     </div>
+    <a href="https://emilio-manoel.github.io/domino-game-offline/" target="_blank" style={{fontSize:"24px", color:"rgb(0, 0, 0)", backgroundColor:"rgb(0, 112, 255)", borderRadius:"10px", padding:"5px 10px", textDecoration:"none", display:"inline-block", marginTop:"20px", position:"fixed", bottom:"20px", right:"20px", zIndex:"1000"}}>jogar offline</a>
+    </>
   );
 }
 
