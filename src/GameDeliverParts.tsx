@@ -115,6 +115,7 @@ export default function Game({
           id="player-main"
           className={`${isTurn ? "turn-player" : ""} ${isPassing ? "pass" : ""}`}
         > 
+        <div className="what-player">{`player ${myNumber}`}</div>
           {myHand.map((piece, i) => {
             const playable = isPlayable(piece);
             return (
@@ -157,6 +158,7 @@ export default function Game({
                 className={`${isTurnOp ? "turn-player" : ""} ${isPaOp ? "pass" : ""}`}
                 style={{ position: 'relative' }}
               >
+                <div className="what-player">{`player ${playerNum}`}</div>
                 {Array.from({ length: count }).map((_, i) => (
                   <span key={i} className={spanClass}></span>
                 ))}

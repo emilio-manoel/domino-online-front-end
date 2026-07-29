@@ -200,8 +200,8 @@
 /* top e bottom */
 .player-main-span,
 .player-top-span {
-  width: clamp(20px, 8vw, 55px);
-  height: clamp(45px, 14vw, 140px);
+  width: clamp(20px, 5vw, 55px);
+  height: clamp(45px, 10vw, 140px);
   border-radius: 8px;
   background-color: gray;
   display: grid;
@@ -212,8 +212,8 @@
 /* left e right */
 .player-left-span,
 .player-right-span {
-  width: clamp(45px, 14vh, 150px);
-  height: clamp(20px, 8vh, 65px);
+  width: clamp(45px, 15vh, 150px);
+  height: clamp(20px, 5vh, 65px);
   border-radius: 8px;
   background-color: gray;
   display: grid;
@@ -263,4 +263,10 @@
   border: 2px solid rgba(255, 255, 255, 0.4);
   pointer-events: none;
   z-index: 5;
+}
+
+.what-player{
+  background-color: rgb(3, 197, 29); 
+  padding: 25px 10px;
+  border-radius: 100%;
 }
