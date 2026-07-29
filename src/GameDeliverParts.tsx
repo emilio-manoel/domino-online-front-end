@@ -16,6 +16,7 @@ export default function Game({
   tableEnds,
   tablePieces,
   passedPlayer,
+  playerHandCounts,
   socket
 }: {
   myHand: DominoPiece[];
@@ -24,6 +25,7 @@ export default function Game({
   tableEnds: number[];
   tablePieces: any[];
   passedPlayer: number | null;
+  playerHandCounts: Record<number, number>;
   socket: Socket;
 }) {
   const isTurn = currentTurn === myNumber;
@@ -139,21 +141,38 @@ export default function Game({
         </div>
 
         {/* Adversários (Escondidos) */}
-        <div id="player-right" className={`${currentTurn === (myNumber === 4 ? 1 : myNumber! + 1) ? "turn-player" : ""} ${passedPlayer === (myNumber === 4 ? 1 : myNumber! + 1) ? "pass" : ""}`}>
-          {Array.from({ length: 7 }).map((_, i) => (
-            <span key={i} className="player-right-span"></span>
-          ))}
-        </div>
-        <div id="player-top" className={`${currentTurn === (myNumber! > 2 ? myNumber! - 2 : myNumber! + 2) ? "turn-player" : ""} ${passedPlayer === (myNumber! > 2 ? myNumber! - 2 : myNumber! + 2) ? "pass" : ""}`}>
-          {Array.from({ length: 7 }).map((_, i) => (
-            <span key={i} className="player-top-span"></span>
-          ))}
-        </div>
-        <div id="player-left" className={`${currentTurn === (myNumber === 1 ? 4 : myNumber! - 1) ? "turn-player" : ""} ${passedPlayer === (myNumber === 1 ? 4 : myNumber! - 1) ? "pass" : ""}`}>
-          {Array.from({ length: 7 }).map((_, i) => (
-            <span key={i} className="player-left-span"></span>
-          ))}
-        </div>
+        {(() => {
+          // Calcula os números dos 3 adversários na ordem: direita, topo, esquerda
+          const right = myNumber === 4 ? 1 : myNumber! + 1;
+          const top   = myNumber! > 2 ? myNumber! - 2 : myNumber! + 2;
+          const left  = myNumber === 1 ? 4 : myNumber! - 1;
+
+          const renderOpponent = (playerNum: number, id: string, spanClass: string) => {
+            const count = playerHandCounts[playerNum] ?? 7;
+            const isTurnOp = currentTurn === playerNum;
+            const isPaOp = passedPlayer === playerNum;
+            return (
+              <div
+                id={id}
+                className={`${isTurnOp ? "turn-player" : ""} ${isPaOp ? "pass" : ""}`}
+                style={{ position: 'relative' }}
+              >
+                {Array.from({ length: count }).map((_, i) => (
+                  <span key={i} className={spanClass}></span>
+                ))}
+                <span className="opponent-count-badge">{count}</span>
+              </div>
+            );
+          };
+
+          return (
+            <>
+              {renderOpponent(right, "player-right", "player-right-span")}
+              {renderOpponent(top,   "player-top",   "player-top-span")}
+              {renderOpponent(left,  "player-left",  "player-left-span")}
+            </>
+          );
+        })()}
 
         {/* Mesa Central */}
         <div id="table" >

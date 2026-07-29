@@ -22,6 +22,16 @@ function App() {
   const [gameOverInfo, setGameOverInfo] = useState<{ winner?: number; tie?: boolean } | null>(null);
   const [abortMessage, setAbortMessage] = useState<string | null>(null);
   const [joinError, setJoinError] = useState<string | null>(null);
+  const [playerHandCounts, setPlayerHandCounts] = useState<Record<number, number>>({});
+
+  const normalizePlayerHandCounts = (counts?: Record<number, number>) =>
+    Object.entries(counts ?? {}).reduce<Record<number, number>>((acc, [key, value]) => {
+      const parsedKey = Number(key);
+      if (!Number.isNaN(parsedKey)) {
+        acc[parsedKey] = Number(value);
+      }
+      return acc;
+    }, {});
 
   // Reseta todo o estado de jogo (volta para a tela de lobby)
   const resetGameState = () => {
@@ -34,6 +44,7 @@ function App() {
     setGameOverInfo(null);
     setCountdown(null);
     setAbortMessage(null);
+    setPlayerHandCounts({});
   };
 
   useEffect(() => {
@@ -67,11 +78,16 @@ function App() {
       setMyHand(data.pieces);
     });
 
-    socket.on("turn-update", (data: { currentTurn: number | null; tableEnds: number[]; tablePieces: any[] }) => {
+    socket.on("turn-update", (data: { currentTurn: number | null; tableEnds: number[]; tablePieces: any[]; playerHandCounts?: Record<number, number> }) => {
       setCurrentTurn(data.currentTurn);
       setTableEnds(data.tableEnds);
       setTablePieces(data.tablePieces);
+      setPlayerHandCounts(normalizePlayerHandCounts(data.playerHandCounts));
       setPassedPlayer(null); // Limpa o estado de pass ao trocar o turno
+    });
+
+    socket.on("player-hand-counts", (data: { playerHandCounts?: Record<number, number> }) => {
+      setPlayerHandCounts(normalizePlayerHandCounts(data.playerHandCounts));
     });
 
     socket.on("player-passed", (data: { playerNumber: number }) => {
@@ -102,6 +118,7 @@ function App() {
       socket.off("game-start");
       socket.off("your-hand");
       socket.off("turn-update");
+      socket.off("player-hand-counts");
       socket.off("player-passed");
       socket.off("game-over");
       socket.off("game-aborted");
@@ -153,6 +170,7 @@ function App() {
           tableEnds={tableEnds}
           tablePieces={tablePieces}
           passedPlayer={passedPlayer}
+          playerHandCounts={playerHandCounts}
           socket={socket}
         />
       </>
@@ -168,14 +186,14 @@ function App() {
 
       {/* Mensagem de partida abortada (jogador desconectou) */}
       {abortMessage && (
-        <p id="abort-message" style={{ color: 'orange', fontWeight: 'bold' }}>
+        <p id="abort-message" style={{ color: 'black', fontWeight: 'bold' }}>
           ⚠️ {abortMessage}
         </p>
       )}
 
       {/* Erro ao tentar entrar na sala */}
       {joinError && (
-        <p id="join-error" style={{ color: 'red', fontWeight: 'bold' }}>
+        <p id="join-error" style={{ color: 'black', fontWeight: 'bold' }}>
           ❌ {joinError}
         </p>
       )}
